@@ -1,1 +1,2 @@
 # pyMinesweeper
+python minesweeper game
