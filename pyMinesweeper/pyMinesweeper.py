@@ -1,11 +1,14 @@
 #Python Minesweeper
 from multiprocessing import get_all_start_methods
 import random
+from winsound import PlaySound
 
 size = int(input("Input board size: ")) 
 gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
-playerBoard = [[0 for x in range(size)] for y in range(size)] # board the player sees
+playerBoard = [["X" for x in range(size)] for y in range(size)] # board the player sees
+clearedBoard = [[0 for x in range(size)] for y in range(size)] # board that marks if spot has been checked to be cleared
 numMines = size * size // 6
+won = False
 
 def printBoard(size, playerBoard):
     print("\t ", end="")
@@ -26,21 +29,75 @@ def generateBoard(gameBoard, numMines): # randomly place the mines in the board
         gameBoard[random.randint(0, size-1)][random.randint(0, size-1)] = "M"
 
 def checkSurround(gameBoard, x, y): #check if there is mine in area around spot
-      for i in range((y-1), (y+2)):
+    mines = 0
+    for i in range((y-1), (y+2)):
           for j in range((x-1), (x+2)):
               if (i >= 0 and i < size and j >= 0 and j < size and (i != y or j != x)):
                 if gameBoard[i][j] == "M":
-                      print("yes")
-                else:
-                      print("no") 
+                      mines += 1
+    return mines
 
 def addNums(gameBoard):
     for i in range(size):
         for j in range(size):
+            if (checkSurround(gameBoard, i, j) > 0 and gameBoard[j][i] != "M"):
+                gameBoard[j][i] = checkSurround(gameBoard, i, j)
             
-#def startBoard(playerBoard, GameBoard): # pick random spot and clear 
-    
+            
+def startBoard(playerBoard, gameBoard): # pick random spot and clear 
+    x = random.randint(0, size-1)
+    y = random.randint(0, size-1)
+    clearArea(playerBoard, gameBoard, x, y)
+                      
+def clearArea(playerBoard, gameBoard, x, y):
+    k = 0
+    for i in range((y-1), (y+2)):
+        for j in range((x-1), (x+2)):
+              if (i >= 0 and i < size and j >= 0 and j < size and (i != y or j != x)):
+                if gameBoard[i][j] != "M":
+                      if gameBoard[i][j] != "M" and playerBoard[i][j] == "X" and clearedBoard[i][j] == 0:
+                          clearedBoard[i][j] = 1 # mark spot as cleared
+                          clearArea(playerBoard, gameBoard, j, i)
+                          k += 1
+                          playerBoard[i][j] = gameBoard[i][j]
+                          
+def checkSpot(playerBoard, gameBoard, x, y):
+    if playerBoard[y][x] == "X":
+        playerBoard[y][x] = gameBoard[y][x]
+        if gameBoard[y][x] == "M":
+            print("You lost!")
+            won = True # game over
+        
+            
 generateBoard(gameBoard, numMines)
+addNums(gameBoard)
 printBoard(size, gameBoard)
 
-#checkSurround(gameBoard, int(input("x")) -1, int(input("y")) -1)
+startBoard(playerBoard, gameBoard)
+printBoard(size, playerBoard)
+
+while won == False:
+    x = int(input("Input x coordinate: ")) -1
+    y = int(input("Input y coordinate: ")) -1
+    action = input("Input action (clear or flag): ")
+    if action == "clear":
+        checkSpot(playerBoard, gameBoard, x, y)
+        printBoard(size, playerBoard)
+        if playerBoard == gameBoard:
+            print("You won!")
+            won = True # end game 
+    if action == "flag":
+        playerBoard[y][x] = "F"
+        if gameBoard[y][x] == "M":
+            gameBoard[y][x] = "F"
+        printBoard(size, playerBoard)
+        if playerBoard == gameBoard:
+            print("You won!")
+            won = True
+    elif action != "clear" and action != "flag":
+        print("Invalid action")
+        printBoard(size, playerBoard)
+        
+        
+    
+    
