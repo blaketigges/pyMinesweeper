@@ -1,5 +1,6 @@
 #Python Minesweeper
 import random
+import tkinter as tk
 
 size = int(input("Input board size: ")) 
 gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
@@ -41,8 +42,11 @@ def addNums(gameBoard):
             
             
 def startBoard(playerBoard, gameBoard): # pick random spot and clear 
-    x = random.randint(0, size-1)
-    y = random.randint(0, size-1)
+    x = random.randint(1, size-2) # random spot but not on the edge
+    y = random.randint(1, size-2)
+    while gameBoard[y][x] == "M": # make sure spot picked isnt a mine
+        x = random.randint(1, size-2)
+        y = random.randint(1, size-2)
     clearArea(playerBoard, gameBoard, x, y)
                       
 def clearArea(playerBoard, gameBoard, x, y):
@@ -59,12 +63,13 @@ def clearArea(playerBoard, gameBoard, x, y):
                           # dont recursively clear area since there are mines around
                           clearedBoard[i][j] = 1 # mark spot as cleared
                           
-def checkSpot(playerBoard, gameBoard, x, y):
+def checkSpot(playerBoard, gameBoard, x, y): # add handling for already cleared spots later
     if playerBoard[y][x] == "X":
         playerBoard[y][x] = gameBoard[y][x]
         if gameBoard[y][x] == "M":
             print("You lost!")
             won = True # game over
+            
         
 printBoard(size, gameBoard) # print gameBoard befpre generation
 generateBoard(gameBoard, numMines) # generate the board with the mines
@@ -80,12 +85,12 @@ while won == False:
     action = input("Input action (clear or flag): ")
     if action == "clear":
         checkSpot(playerBoard, gameBoard, x, y)
-        if playerBoard == gameBoard:
-            print("You won!")
-            won = True # end game
-            break
-        clearArea(playerBoard, gameBoard, x, y) # if area is clear, clear area around spot
-        printBoard(size, playerBoard)
+        if won == False: # only run these if spot wasnt mine
+            if playerBoard == gameBoard:
+                print("You won!")
+                won = True # end game
+            clearArea(playerBoard, gameBoard, x, y) # if area is clear, clear area around spot
+            printBoard(size, playerBoard)
         
     if action == "flag":
         playerBoard[y][x] = "F"
@@ -98,6 +103,9 @@ while won == False:
     elif action != "clear" and action != "flag":
         print("Invalid action")
         printBoard(size, playerBoard)
+    
+    if won == True:
+        break
         
         
     
