@@ -70,24 +70,7 @@ def checkSpot(playerBoard, gameBoard, x, y): # add handling for already cleared 
             print("You lost!")
             won = True # game over
             
-def clearSpot(playerBoard, gameBoard, x, y, won):
-    checkSpot(playerBoard, gameBoard, x, y)
-    if won == False: # only run these if spot wasnt mine
-        if playerBoard == gameBoard:
-            print("You won!")
-            won = True # end game
-        clearArea(playerBoard, gameBoard, x, y) # if area is clear, clear area around spot
-        printBoard(size, playerBoard)
-
-def flagSpot(playerBoard, gameBoard, x, y, won):
-    playerBoard[y][x] = "F"
-    if gameBoard[y][x] == "M":
-        gameBoard[y][x] = "F"
-    printBoard(size, playerBoard)
-    if playerBoard == gameBoard:
-        print("You won!")
-        won = True # end game
-
+        
 printBoard(size, gameBoard) # print gameBoard befpre generation
 generateBoard(gameBoard, numMines) # generate the board with the mines
 addNums(gameBoard) # add numbers to the board
@@ -95,33 +78,6 @@ printBoard(size, gameBoard) # print gameBoard after generation and numbers
 
 startBoard(playerBoard, gameBoard) # start the game by randomly picking spot and revealing clear space around it
 printBoard(size, playerBoard) # print playerBoard so game can begin
-
-window = tk.Tk()
-window.title("Minesweeper")
-window.aspect(1, 1, 1, 1)
-window.resizable = (False,False)
-blank_image = tk.PhotoImage()
-def updateBoard(playerBoard, gameBoard, won, size):
-    for x in range(size):
-        for y in range(size):
-            if playerBoard[y][x] == "X":
-                btn = tk.Button(window, text=" ")
-                btn.grid(row=y, column=x)
-                btn.width = 10
-                btn.bind("<Button-1>", clearSpot(playerBoard, gameBoard, x, y, won))
-                btn.bind("<Button-2>", flagSpot(playerBoard, gameBoard, x, y, won))
-                btn.bind("<Button-3>", flagSpot(playerBoard, gameBoard, x, y, won))
-            elif playerBoard[y][x] == "F" or playerBoard[y][x] in range(9):
-                btn = tk.Button(window, text=playerBoard[y][x])
-                btn.grid(row=y, column=x)
-                btn.width = 1
-                btn.bind("<Button-1>", clearSpot(playerBoard, gameBoard, x, y, won))
-                btn.bind("<Button-2>", flagSpot(playerBoard, gameBoard, x, y, won))
-                btn.bind("<Button-3>", flagSpot(playerBoard, gameBoard, x, y, won))
-
-while won == False:
-    updateBoard(playerBoard, gameBoard, won, size)
-
 
 while won == False:
     x = int(input("Input x coordinate: ")) -1
@@ -149,7 +105,7 @@ while won == False:
         printBoard(size, playerBoard)
     
     if won == True:
-        break 
+        break
         
         
     
