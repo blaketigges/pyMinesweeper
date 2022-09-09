@@ -50,6 +50,7 @@ def startBoard(playerBoard, gameBoard): # pick random spot and clear
     clearArea(playerBoard, gameBoard, x, y)
                       
 def clearArea(playerBoard, gameBoard, x, y):
+    playerBoard[y][x] = gameBoard[y][x]
     for i in range((y-1), (y+2)):
         for j in range((x-1), (x+2)):
               if (i >= 0 and i < size and j >= 0 and j < size and (i != y or j != x)):
@@ -68,6 +69,7 @@ def checkSpot(playerBoard, gameBoard, x, y): # add handling for already cleared 
         playerBoard[y][x] = gameBoard[y][x]
         if gameBoard[y][x] == "M":
             print("You lost!")
+            global won
             won = True # game over
             
         
@@ -77,6 +79,7 @@ addNums(gameBoard) # add numbers to the board
 printBoard(size, gameBoard) # print gameBoard after generation and numbers
 
 startBoard(playerBoard, gameBoard) # start the game by randomly picking spot and revealing clear space around it
+print("X is for spots that are unknown, numbers mean mines are around, and F marks your placed flags\n")
 printBoard(size, playerBoard) # print playerBoard so game can begin
 
 while won == False:
@@ -86,11 +89,11 @@ while won == False:
     if action == "clear":
         checkSpot(playerBoard, gameBoard, x, y)
         if won == False: # only run these if spot wasnt mine
+            clearArea(playerBoard, gameBoard, x, y) # if area is clear, clear area around spot
+            printBoard(size, playerBoard)
             if playerBoard == gameBoard:
                 print("You won!")
                 won = True # end game
-            clearArea(playerBoard, gameBoard, x, y) # if area is clear, clear area around spot
-            printBoard(size, playerBoard)
         
     if action == "flag":
         playerBoard[y][x] = "F"
@@ -104,8 +107,6 @@ while won == False:
         print("Invalid action")
         printBoard(size, playerBoard)
     
-    if won == True:
-        break
         
         
     
