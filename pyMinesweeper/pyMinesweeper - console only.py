@@ -1,6 +1,5 @@
 #Python Minesweeper
 import random
-import tkinter as tk
 
 size = int(input("Input board size: ")) 
 gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines

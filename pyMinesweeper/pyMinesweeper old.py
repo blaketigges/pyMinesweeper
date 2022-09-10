@@ -1,8 +1,6 @@
 #Python Minesweeper
 import random
 import tkinter as tk
-from turtle import update
-from winsound import PlaySound
 
 size = int(input("Input board size: ")) 
 gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
@@ -52,7 +50,6 @@ def startBoard(playerBoard, gameBoard): # pick random spot and clear
     clearArea(playerBoard, gameBoard, x, y)
                       
 def clearArea(playerBoard, gameBoard, x, y):
-    playerBoard[y][x] = gameBoard[y][x]
     for i in range((y-1), (y+2)):
         for j in range((x-1), (x+2)):
               if (i >= 0 and i < size and j >= 0 and j < size and (i != y or j != x)):
@@ -71,35 +68,26 @@ def checkSpot(playerBoard, gameBoard, x, y): # add handling for already cleared 
         playerBoard[y][x] = gameBoard[y][x]
         if gameBoard[y][x] == "M":
             print("You lost!")
-            global won
             won = True # game over
             
-def clearSpot(playerBoard, gameBoard, x, y):
+def clearSpot(playerBoard, gameBoard, x, y, won):
     checkSpot(playerBoard, gameBoard, x, y)
-    global won
     if won == False: # only run these if spot wasnt mine
+        if playerBoard == gameBoard:
+            print("You won!")
+            won = True # end game
         clearArea(playerBoard, gameBoard, x, y) # if area is clear, clear area around spot
         printBoard(size, playerBoard)
-    if playerBoard == gameBoard:
-        print("You won!")
-        won = True # end game
 
-def flagSpot(playerBoard, gameBoard, x, y):
-    global won
+def flagSpot(playerBoard, gameBoard, x, y, won):
     playerBoard[y][x] = "F"
     if gameBoard[y][x] == "M":
         gameBoard[y][x] = "F"
-        printBoard(size, playerBoard)
+    printBoard(size, playerBoard)
     if playerBoard == gameBoard:
         print("You won!")
         won = True # end game
 
-def click(playerBoard, gameBoard, x, y, callback):
-    print("x: ", x, "y: ", y)
-    clearSpot(playerBoard, gameBoard, x, y)
-    callback(playerBoard, gameBoard, size) # update board after click
-    
-    
 printBoard(size, gameBoard) # print gameBoard befpre generation
 generateBoard(gameBoard, numMines) # generate the board with the mines
 addNums(gameBoard) # add numbers to the board
@@ -112,26 +100,56 @@ window = tk.Tk()
 window.title("Minesweeper")
 window.aspect(1, 1, 1, 1)
 window.resizable = (False,False)
-    
-def updateBoard(playerBoard, gameBoard, size):
-# create grid of buttons 
+blank_image = tk.PhotoImage()
+def updateBoard(playerBoard, gameBoard, won, size):
     for x in range(size):
         for y in range(size):
             if playerBoard[y][x] == "X":
-                btn = tk.Button(window, text=" ", command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
+                btn = tk.Button(window, text=" ")
                 btn.grid(row=y, column=x)
                 btn.width = 10
+                btn.bind("<Button-1>", clearSpot(playerBoard, gameBoard, x, y, won))
+                btn.bind("<Button-2>", flagSpot(playerBoard, gameBoard, x, y, won))
+                btn.bind("<Button-3>", flagSpot(playerBoard, gameBoard, x, y, won))
             elif playerBoard[y][x] == "F" or playerBoard[y][x] in range(9):
-                btn = tk.Button(window, text=playerBoard[y][x], command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
+                btn = tk.Button(window, text=playerBoard[y][x])
                 btn.grid(row=y, column=x)
                 btn.width = 1
-                
-updateBoard(playerBoard, gameBoard, size)
+                btn.bind("<Button-1>", clearSpot(playerBoard, gameBoard, x, y, won))
+                btn.bind("<Button-2>", flagSpot(playerBoard, gameBoard, x, y, won))
+                btn.bind("<Button-3>", flagSpot(playerBoard, gameBoard, x, y, won))
+
 while won == False:
-    window.update_idletasks()
-    window.update()
-                
+    updateBoard(playerBoard, gameBoard, won, size)
+
+
+while won == False:
+    x = int(input("Input x coordinate: ")) -1
+    y = int(input("Input y coordinate: ")) -1
+    action = input("Input action (clear or flag): ")
+    if action == "clear":
+        checkSpot(playerBoard, gameBoard, x, y)
+        if won == False: # only run these if spot wasnt mine
+            if playerBoard == gameBoard:
+                print("You won!")
+                won = True # end game
+            clearArea(playerBoard, gameBoard, x, y) # if area is clear, clear area around spot
+            printBoard(size, playerBoard)
+        
+    if action == "flag":
+        playerBoard[y][x] = "F"
+        if gameBoard[y][x] == "M":
+            gameBoard[y][x] = "F"
+        printBoard(size, playerBoard)
+        if playerBoard == gameBoard:
+            print("You won!")
+            won = True # end game
+    elif action != "clear" and action != "flag":
+        print("Invalid action")
+        printBoard(size, playerBoard)
     
+    if won == True:
+        break 
         
         
     
