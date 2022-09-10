@@ -10,6 +10,7 @@ playerBoard = [["X" for x in range(size)] for y in range(size)] # board the play
 clearedBoard = [[0 for x in range(size)] for y in range(size)] # board that marks if spot has been checked to be cleared
 numMines = size * size // 7
 won = False
+mode = 0 # whether to check or flag spot, 0 is check, 1 is flag
 
 def printBoard(size, playerBoard):
     print("\t ", end="")
@@ -79,7 +80,6 @@ def clearSpot(playerBoard, gameBoard, x, y):
     global won
     if won == False: # only run these if spot wasnt mine
         clearArea(playerBoard, gameBoard, x, y) # if area is clear, clear area around spot
-        printBoard(size, playerBoard)
     if playerBoard == gameBoard:
         print("You won!")
         won = True # end game
@@ -89,14 +89,17 @@ def flagSpot(playerBoard, gameBoard, x, y):
     playerBoard[y][x] = "F"
     if gameBoard[y][x] == "M":
         gameBoard[y][x] = "F"
-        printBoard(size, playerBoard)
     if playerBoard == gameBoard:
         print("You won!")
         won = True # end game
 
 def click(playerBoard, gameBoard, x, y, callback):
     print("x: ", x, "y: ", y)
-    clearSpot(playerBoard, gameBoard, x, y)
+    if mode == 1:
+        flagSpot(playerBoard, gameBoard, x, y)
+    elif mode == 0:
+        clearSpot(playerBoard, gameBoard, x, y)
+        
     callback(playerBoard, gameBoard, size) # update board after click
     
     
@@ -112,18 +115,28 @@ window = tk.Tk()
 window.title("Minesweeper")
 window.aspect(1, 1, 1, 1)
 window.resizable = (False,False)
+
+def changeMode(m):
+    global mode
+    mode = m
+    print("Mode: ", mode)
     
 def updateBoard(playerBoard, gameBoard, size):
-# create grid of buttons 
+    global mode
+    flag = tk.Button(window, text="Flag", command=lambda: changeMode(1))
+    flag.grid(row=0, column=int((size/2) - 2))
+    check = tk.Button(window, text="Check", command=lambda: changeMode(0))
+    check.grid(row=0, column=int((size/2) + 2))
+    # create grid of buttons 
     for x in range(size):
         for y in range(size):
             if playerBoard[y][x] == "X":
                 btn = tk.Button(window, text=" ", command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
-                btn.grid(row=y, column=x)
+                btn.grid(row=y+2, column=x)
                 btn.width = 10
             elif playerBoard[y][x] == "F" or playerBoard[y][x] in range(9):
                 btn = tk.Button(window, text=playerBoard[y][x], command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
-                btn.grid(row=y, column=x)
+                btn.grid(row=y+2, column=x)
                 btn.width = 1
                 
 updateBoard(playerBoard, gameBoard, size)

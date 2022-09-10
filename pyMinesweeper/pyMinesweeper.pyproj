@@ -24,7 +24,6 @@
   <ItemGroup>
     <Compile Include="pyMinesweeper - console only.py" />
     <Compile Include="pyMinesweeper.py" />
-    <Compile Include="pyMinesweeper old.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
