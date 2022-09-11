@@ -1,16 +1,10 @@
 #Python Minesweeper
 import random
 import tkinter as tk
-from turtle import update, width
-from winsound import PlaySound
+from tkinter.messagebox import askyesno
+from tkinter.simpledialog import askstring
 
-size = int(input("Input board size: ")) 
-gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
-playerBoard = [["X" for x in range(size)] for y in range(size)] # board the player sees
-clearedBoard = [[0 for x in range(size)] for y in range(size)] # board that marks if spot has been checked to be cleared
-numMines = size * size // 7
-won = False
-mode = 0 # whether to check or flag spot, 0 is check, 1 is flag
+
 
 def printBoard(size, playerBoard):
     print("\t ", end="")
@@ -67,13 +61,15 @@ def clearArea(playerBoard, gameBoard, x, y):
                           # dont recursively clear area since there are mines around
                           clearedBoard[i][j] = 1 # mark spot as cleared
                           
-def checkSpot(playerBoard, gameBoard, x, y): # add handling for already cleared spots later
+def checkSpot(playerBoard, gameBoard, x, y):
     if playerBoard[y][x] == "X":
         playerBoard[y][x] = gameBoard[y][x]
         if gameBoard[y][x] == "M":
             print("You lost!")
             global won
             won = True # game over
+            global lost
+            lost = True
             
 def clearSpot(playerBoard, gameBoard, x, y):
     checkSpot(playerBoard, gameBoard, x, y)
@@ -86,9 +82,15 @@ def clearSpot(playerBoard, gameBoard, x, y):
 
 def flagSpot(playerBoard, gameBoard, x, y):
     global won
-    playerBoard[y][x] = "F"
-    if gameBoard[y][x] == "M":
-        gameBoard[y][x] = "F"
+    if playerBoard[y][x] == "X":
+        playerBoard[y][x] = "F"
+        if gameBoard[y][x] == "M":
+            gameBoard[y][x] = "F"
+    elif playerBoard[y][x] == "F":
+        playerBoard[y][x] = "X"
+        if gameBoard[y][x] == "F":
+            gameBoard[y][x] = "M"
+    
     if playerBoard == gameBoard:
         print("You won!")
         won = True # end game
@@ -99,22 +101,26 @@ def click(playerBoard, gameBoard, x, y, callback):
         flagSpot(playerBoard, gameBoard, x, y)
     elif mode == 0:
         clearSpot(playerBoard, gameBoard, x, y)
-        
+     
+    printBoard(size, playerBoard)
+    printBoard(size, gameBoard)
     callback(playerBoard, gameBoard, size) # update board after click
     
-    
-printBoard(size, gameBoard) # print gameBoard befpre generation
-generateBoard(gameBoard, numMines) # generate the board with the mines
-addNums(gameBoard) # add numbers to the board
-printBoard(size, gameBoard) # print gameBoard after generation and numbers
+def revealMines(playerBoard, gameBoard, size):
+    for i in range(size):
+        for j in range(size):
+            if gameBoard[i][j] == "M" and playerBoard[i][j] != "F":
+                playerBoard[i][j] = "M"
+    updateBoard(playerBoard, gameBoard, size)
 
-startBoard(playerBoard, gameBoard) # start the game by randomly picking spot and revealing clear space around it
-printBoard(size, playerBoard) # print playerBoard so game can begin
+
 
 window = tk.Tk()
 window.title("Minesweeper")
 window.aspect(1, 1, 1, 1)
 window.resizable = (False,False)
+
+size = 0
 
 def changeMode(m):
     global mode
@@ -136,11 +142,58 @@ def updateBoard(playerBoard, gameBoard, size):
             elif playerBoard[y][x] == "F" or playerBoard[y][x] in range(9):
                 btn = tk.Button(window, text=playerBoard[y][x], width=2, command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
                 btn.grid(row=y+2, column=x)
+  
+gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
+playerBoard = [["X" for x in range(size)] for y in range(size)] # board the player sees
+clearedBoard = [[0 for x in range(size)] for y in range(size)] # board that marks if spot has been checked to be cleared
+numMines = size * size // 7
+won = False
+lost = False
+mode = 0 # whether to check or flag spot, 0 is check, 1 is flag   
+
+def initGame():
+    global playerBoard
+    global gameBoard
+    global clearedBoard
+    global won
+    global lost
+    global size
+    won = False
+    lost = False
+    window.update_idletasks()
+    size = int(askstring("Board Size", "Enter board size",parent=window))
+    gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
+    playerBoard = [["X" for x in range(size)] for y in range(size)] # board the player sees
+    clearedBoard = [[0 for x in range(size)] for y in range(size)] # board that marks if spot has been checked to be cleared
+    numMines = size * size // 7
+    generateBoard(gameBoard, numMines)  # place mines
+    addNums(gameBoard) # add the numbers
+    startBoard(playerBoard, gameBoard) # make the board the player sees
+    for widget in window.winfo_children():
+        widget.destroy()
+    updateBoard(playerBoard, gameBoard, size) # make the window with the board
                 
-updateBoard(playerBoard, gameBoard, size)
+initGame()
 while won == False:
+    
     window.update_idletasks()
     window.update()
+    if lost == True:
+        revealMines(playerBoard, gameBoard, size)
+    if (won == True and lost == True):
+        window.update_idletasks()
+        answer = askyesno("Game Over", "You lost! Play again?",parent=window)
+        if answer == True:
+            initGame()
+        else:
+            break
+    elif (won == True and lost == False):
+        window.update_idletasks()
+        answer = askyesno("Game Over", "You won! Play again?",parent=window)
+        if answer == True:
+            initGame()
+        else:
+            break
                 
     
         
