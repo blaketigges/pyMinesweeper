@@ -1,7 +1,7 @@
 #Python Minesweeper
 import random
 import tkinter as tk
-from turtle import update
+from turtle import update, width
 from winsound import PlaySound
 
 size = int(input("Input board size: ")) 
@@ -123,21 +123,19 @@ def changeMode(m):
     
 def updateBoard(playerBoard, gameBoard, size):
     global mode
-    flag = tk.Button(window, text="Flag", command=lambda: changeMode(1))
+    flag = tk.Button(window, width=2, text="Flag", command=lambda: changeMode(1))
     flag.grid(row=0, column=int((size/2) - 2))
-    check = tk.Button(window, text="Check", command=lambda: changeMode(0))
+    check = tk.Button(window, width=2, text="Check", command=lambda: changeMode(0))
     check.grid(row=0, column=int((size/2) + 2))
     # create grid of buttons 
     for x in range(size):
         for y in range(size):
             if playerBoard[y][x] == "X":
-                btn = tk.Button(window, text=" ", command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
+                btn = tk.Button(window, text=" ", width=2, command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
                 btn.grid(row=y+2, column=x)
-                btn.width = 10
             elif playerBoard[y][x] == "F" or playerBoard[y][x] in range(9):
-                btn = tk.Button(window, text=playerBoard[y][x], command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
+                btn = tk.Button(window, text=playerBoard[y][x], width=2, command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
                 btn.grid(row=y+2, column=x)
-                btn.width = 1
                 
 updateBoard(playerBoard, gameBoard, size)
 while won == False:
