@@ -143,8 +143,11 @@ def updateBoard(playerBoard, gameBoard, size):
                 btn = tk.Button(window, text=playerBoard[y][x], width=2, command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
                 btn.grid(row=y+2, column=x)
             elif playerBoard[y][x] in range(9):
-                txt = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat")
-                txt.grid(row=y+2, column=x)
+                btn = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat", state="disabled")
+                btn.grid(row=y+2, column=x)
+            elif playerBoard[y][x] == "M":
+                btn = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat", state="disabled")
+                btn.grid(row=y+2, column=x)
   
 gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
 playerBoard = [["X" for x in range(size)] for y in range(size)] # board the player sees
@@ -153,6 +156,19 @@ numMines = size * size // 7
 won = False
 lost = False
 mode = 0 # whether to check or flag spot, 0 is check, 1 is flag   
+
+def isInt(i):
+    try:
+        int(i)
+        return True
+    except ValueError:
+        return False
+def getSize():
+    size = askstring("Board Size", "Enter board size",parent=window)
+    while isInt(size) == False or int(size) < 6:
+        tk.messagebox.showerror("Error", "Please enter a number greater than 5")
+        size = askstring("Board Size", "Enter board size",parent=window)
+    return int(size)
 
 def initGame():
     global playerBoard
@@ -164,7 +180,7 @@ def initGame():
     won = False
     lost = False
     window.update_idletasks()
-    size = int(askstring("Board Size", "Enter board size",parent=window))
+    size = getSize()
     gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
     playerBoard = [["X" for x in range(size)] for y in range(size)] # board the player sees
     clearedBoard = [[0 for x in range(size)] for y in range(size)] # board that marks if spot has been checked to be cleared
