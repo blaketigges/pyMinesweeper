@@ -139,9 +139,12 @@ def updateBoard(playerBoard, gameBoard, size):
             if playerBoard[y][x] == "X":
                 btn = tk.Button(window, text=" ", width=2, command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
                 btn.grid(row=y+2, column=x)
-            elif playerBoard[y][x] == "F" or playerBoard[y][x] in range(9):
+            elif playerBoard[y][x] == "F":
                 btn = tk.Button(window, text=playerBoard[y][x], width=2, command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
                 btn.grid(row=y+2, column=x)
+            elif playerBoard[y][x] in range(9):
+                txt = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat")
+                txt.grid(row=y+2, column=x)
   
 gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
 playerBoard = [["X" for x in range(size)] for y in range(size)] # board the player sees
