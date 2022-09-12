@@ -3,6 +3,7 @@ import random
 import tkinter as tk
 from tkinter.messagebox import askyesno
 from tkinter.simpledialog import askstring
+from turtle import color
 
 
 
@@ -143,10 +144,10 @@ def updateBoard(playerBoard, gameBoard, size):
                 btn = tk.Button(window, text=playerBoard[y][x], width=2, command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
                 btn.grid(row=y+2, column=x)
             elif playerBoard[y][x] in range(9):
-                btn = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat", state="disabled")
+                btn = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat", state="disabled", disabledforeground="black")
                 btn.grid(row=y+2, column=x)
             elif playerBoard[y][x] == "M":
-                btn = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat", state="disabled")
+                btn = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat", state="disabled", disabledforeground="red")
                 btn.grid(row=y+2, column=x)
   
 gameBoard = [[0 for x in range(size)] for y in range(size)] # generate the board with the mines
@@ -165,8 +166,8 @@ def isInt(i):
         return False
 def getSize():
     size = askstring("Board Size", "Enter board size",parent=window)
-    while isInt(size) == False or int(size) < 6:
-        tk.messagebox.showerror("Error", "Please enter a number greater than 5")
+    while isInt(size) == False or int(size) < 6 or int(size) > 25:
+        tk.messagebox.showerror("Error", "Please enter a number between 5 and 25")
         size = askstring("Board Size", "Enter board size",parent=window)
     return int(size)
 
