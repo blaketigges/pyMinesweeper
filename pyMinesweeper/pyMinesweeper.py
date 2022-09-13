@@ -127,7 +127,20 @@ def changeMode(m):
     global mode
     mode = m
     print("Mode: ", mode)
-    
+ 
+def numberColor(num): 
+    # blue for 1, green for 2, red for 3, purple for 4
+    color="black"
+    if num == 1:
+        color="blue"
+    elif num == 2:
+        color="green"
+    elif num == 3:
+        color="red"
+    elif num == 4:
+        color="purple"
+    return color
+        
 def updateBoard(playerBoard, gameBoard, size):
     global mode
     flag = tk.Button(window, width=2, text="Flag", command=lambda: changeMode(1))
@@ -144,7 +157,9 @@ def updateBoard(playerBoard, gameBoard, size):
                 btn = tk.Button(window, text=playerBoard[y][x], width=2, command=lambda x=x, y=y: click(playerBoard, gameBoard, x, y, updateBoard))
                 btn.grid(row=y+2, column=x)
             elif playerBoard[y][x] in range(9):
-                btn = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat", state="disabled", disabledforeground="black")
+                btn = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat", state="disabled", disabledforeground=numberColor(playerBoard[y][x]))
+                if playerBoard[y][x] == 0:
+                    btn.config(text=" ")
                 btn.grid(row=y+2, column=x)
             elif playerBoard[y][x] == "M":
                 btn = tk.Button(window, text=playerBoard[y][x], width=2, relief="flat", state="disabled", disabledforeground="red")
